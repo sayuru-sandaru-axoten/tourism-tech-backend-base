@@ -26,7 +26,6 @@ Not started: everything else — no Destinations, Experiences, Availability, Pri
 **Immediate housekeeping (do before Phase 1 feature work):**
 
 1. Commit the Identity/RBAC foundation as its own logical commit(s) — nothing above is in git history yet.
-2. Decide `users.status` (active/suspended/pending) now or drop it from scope — it's referenced in the schema but not yet a column.
 
 ---
 
@@ -58,10 +57,12 @@ Build backend domains in this order — each depends on the one before it:
 - [x] Laravel 13 skeleton, MySQL connection
 - [x] JWT auth: register / login / refresh-token / logout / me / admin session gate
 - [x] RBAC: 8 roles, 18 permissions (`TravelAccessSeeder`)
-- [ ] Fix `JwtAuthTest` route mismatch; add register/refresh/logout + `admin/session` gate coverage
+- [x] Auth test coverage: register/login/refresh/logout, blacklist-on-refresh, `admin/session` permission gate
 - [ ] Commit the Identity/RBAC slice
-- [ ] Add `users.status` column (active/suspended/pending) if kept in scope
-- [ ] `traveler_profiles`, `staff_profiles`, `partner_profiles` migrations + models (all FK → `users`, all nullable-safe so a bare `User` still works)
+- [x] Add `users.status` column — `active`/`suspended` only (no `pending`: new accounts are active immediately, no email-verification gate is planned); login rejects `suspended` with 403
+- [x] Add `users.phone` column
+- [x] `traveler_profiles` migration + model, auto-created (empty) in `RegisterTraveler` — see `ARCHITECTURE.md` §2.1
+- [ ] `staff_profiles`, `partner_profiles` migrations + models (all FK → `users`, all nullable-safe so a bare `User` still works)
 - [ ] Minimal `partners` table (id, name, partner_type) — just enough for `partner_profiles.partner_id` and `experiences.partner_id` to attach to; full Partners domain is Phase 5
 
 ### 1.2 Destinations

@@ -4,21 +4,29 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domains\Identity\Enums\UserStatus;
+use App\Domains\Identity\Models\TravelerProfile;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-#[Fillable(['name', 'email', 'password', 'status'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable;
+
+    /**
+     * @var list<string>
+     */
+    protected $fillable = ['name', 'email', 'phone', 'password', 'status'];
+
+    /**
+     * @var list<string>
+     */
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * Roles and permissions are evaluated against the same JWT API guard that
@@ -66,5 +74,13 @@ class User extends Authenticatable implements JWTSubject
             'password' => 'hashed',
             'status' => UserStatus::class,
         ];
+    }
+
+    /**
+     * @return HasOne<TravelerProfile, $this>
+     */
+    public function travelerProfile(): HasOne
+    {
+        return $this->hasOne(TravelerProfile::class);
     }
 }
