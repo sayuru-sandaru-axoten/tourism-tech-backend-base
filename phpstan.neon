@@ -1,0 +1,13 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+
+    level: 9
+
+    # This codebase uses Laravel 11+'s casts() method (User::casts()), not the
+    # classic $casts property — Larastan doesn't infer model attribute types
+    # from it unless this is on.
+    parseModelCastsMethod: true

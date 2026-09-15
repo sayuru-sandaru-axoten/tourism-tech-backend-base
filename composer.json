@@ -9,14 +9,17 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "dedoc/scramble": "*",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "spatie/laravel-permission": "8.3",
         "tymon/jwt-auth": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "*",
+        "laravel/boost": "*",
         "laravel/pail": "^1.2.5",
         "laravel/pao": "^1.0.6",
         "laravel/pint": "^1.27",
