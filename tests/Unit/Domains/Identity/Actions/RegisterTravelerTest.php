@@ -6,6 +6,7 @@ use App\Domains\Identity\Actions\RegisterTraveler;
 use App\Domains\Identity\Enums\UserStatus;
 use App\Domains\Identity\Events\UserRegistered;
 use App\Models\User;
+use App\Support\Auth\ApiGuard;
 use Database\Seeders\TravelAccessSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -31,7 +32,9 @@ class RegisterTravelerTest extends TestCase
         $user = User::query()->where('email', 'ama@example.com')->firstOrFail();
         $this->assertTrue($user->hasRole('traveler'));
         $this->assertSame(UserStatus::Active, $user->status);
-        $this->assertTrue(auth('api')->setToken($token)->user()->is($user));
+        $authenticatedUser = ApiGuard::guard()->setToken($token)->user();
+        $this->assertInstanceOf(User::class, $authenticatedUser);
+        $this->assertTrue($authenticatedUser->is($user));
 
         Event::assertDispatched(
             UserRegistered::class,
