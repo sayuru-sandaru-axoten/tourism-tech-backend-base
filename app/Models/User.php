@@ -4,7 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domains\Identity\Enums\UserStatus;
+use App\Domains\Identity\Models\StaffProfile;
 use App\Domains\Identity\Models\TravelerProfile;
+use App\Domains\Partners\Models\PartnerProfile;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -82,5 +84,21 @@ class User extends Authenticatable implements JWTSubject
     public function travelerProfile(): HasOne
     {
         return $this->hasOne(TravelerProfile::class);
+    }
+
+    /**
+     * @return HasOne<StaffProfile, $this>
+     */
+    public function staffProfile(): HasOne
+    {
+        return $this->hasOne(StaffProfile::class);
+    }
+
+    /**
+     * @return HasOne<PartnerProfile, $this>
+     */
+    public function partnerProfile(): HasOne
+    {
+        return $this->hasOne(PartnerProfile::class);
     }
 }
