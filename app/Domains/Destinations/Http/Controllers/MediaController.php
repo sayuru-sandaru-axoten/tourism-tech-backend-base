@@ -11,6 +11,7 @@ use App\Domains\Destinations\Http\Resources\MediaResource;
 use App\Domains\Destinations\Models\Destination;
 use App\Domains\Destinations\Models\Media;
 use App\Domains\Destinations\Models\Place;
+use App\Domains\Experiences\Models\Experience;
 use App\Http\Controllers\Controller;
 use App\Support\Http\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +28,11 @@ class MediaController extends Controller
         return ApiResponse::success(MediaResource::collection($place->media()->orderBy('sort_order')->get()));
     }
 
+    public function indexForExperience(Experience $experience): JsonResponse
+    {
+        return ApiResponse::success(MediaResource::collection($experience->media()->orderBy('sort_order')->get()));
+    }
+
     public function storeForDestination(StoreMediaRequest $request, Destination $destination, UploadMedia $action): JsonResponse
     {
         $media = $action->handle($destination, $request->validated());
@@ -37,6 +43,13 @@ class MediaController extends Controller
     public function storeForPlace(StoreMediaRequest $request, Place $place, UploadMedia $action): JsonResponse
     {
         $media = $action->handle($place, $request->validated());
+
+        return ApiResponse::success(new MediaResource($media), 'Media uploaded.', 201);
+    }
+
+    public function storeForExperience(StoreMediaRequest $request, Experience $experience, UploadMedia $action): JsonResponse
+    {
+        $media = $action->handle($experience, $request->validated());
 
         return ApiResponse::success(new MediaResource($media), 'Media uploaded.', 201);
     }

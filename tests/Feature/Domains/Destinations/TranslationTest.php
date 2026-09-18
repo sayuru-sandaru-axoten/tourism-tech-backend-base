@@ -5,6 +5,7 @@ namespace Tests\Feature\Domains\Destinations;
 use App\Domains\Destinations\Models\Destination;
 use App\Domains\Destinations\Models\Place;
 use App\Domains\Destinations\Models\Translation;
+use App\Domains\Experiences\Models\Experience;
 use App\Models\User;
 use Database\Seeders\TravelAccessSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -123,6 +124,40 @@ class TranslationTest extends TestCase
             ->getJson("/api/v1/admin/places/{$place->id}/translations")
             ->assertOk()
             ->assertJsonCount(1, 'data');
+    }
+
+    // ─── EXPERIENCE OWNER ─────────────────────────────────────
+
+    public function test_staff_can_upsert_a_translation_for_an_experience(): void
+    {
+        $experience = Experience::factory()->create();
+
+        $this->actingAsStaff()
+            ->putJson("/api/v1/admin/experiences/{$experience->id}/translations", [
+                'locale' => 'fr', 'field_key' => 'description', 'value' => 'Une belle experience',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.locale', 'fr');
+
+        $this->assertDatabaseHas('translations', [
+            'translatable_type' => 'experience',
+            'translatable_id' => $experience->id,
+            'locale' => 'fr',
+        ]);
+    }
+
+    public function test_experience_translations_index_is_scoped(): void
+    {
+        $experience = Experience::factory()->create();
+
+        Translation::factory()->create(['translatable_type' => 'experience', 'translatable_id' => $experience->id, 'locale' => 'fr']);
+        Translation::factory()->create(['translatable_type' => 'experience', 'translatable_id' => $experience->id, 'locale' => 'de']);
+        Translation::factory()->create(); // different owner
+
+        $this->actingAsStaff()
+            ->getJson("/api/v1/admin/experiences/{$experience->id}/translations")
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
     }
 
     // ─── DESTROY ──────────────────────────────────────────────

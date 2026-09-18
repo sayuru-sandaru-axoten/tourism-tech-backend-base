@@ -8,4 +8,5 @@ Route::prefix('v1')->group(function (): void {
     require app_path('Domains/Identity/routes.php');
     require app_path('Domains/Partners/routes.php');
     require app_path('Domains/Destinations/routes.php');
+    require app_path('Domains/Experiences/routes.php');
 });

@@ -5,6 +5,7 @@ namespace Tests\Feature\Domains\Destinations;
 use App\Domains\Destinations\Models\Destination;
 use App\Domains\Destinations\Models\Media;
 use App\Domains\Destinations\Models\Place;
+use App\Domains\Experiences\Models\Experience;
 use App\Models\User;
 use Database\Seeders\TravelAccessSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -90,6 +91,21 @@ class MediaTest extends TestCase
             ->assertJsonValidationErrors('file');
     }
 
+    public function test_staff_can_upload_media_to_an_experience(): void
+    {
+        $experience = Experience::factory()->create();
+        $file = UploadedFile::fake()->image('photo.jpg');
+
+        $response = $this->actingAsStaff()
+            ->postJson("/api/v1/admin/experiences/{$experience->id}/media", ['file' => $file])
+            ->assertCreated()
+            ->assertJsonPath('data.media_type', 'image');
+
+        $path = $response->json('data.path');
+        Storage::disk('public')->assertExists($path);
+        $this->assertStringStartsWith('experience-media/', $path);
+    }
+
     // ─── INDEX (scoped) ───────────────────────────────────────
 
     public function test_media_index_is_scoped_to_its_mediable(): void
@@ -109,6 +125,19 @@ class MediaTest extends TestCase
             ->getJson("/api/v1/admin/places/{$place->id}/media")
             ->assertOk()
             ->assertJsonCount(1, 'data');
+    }
+
+    public function test_experience_media_index_is_scoped(): void
+    {
+        $experience = Experience::factory()->create();
+
+        Media::factory()->count(2)->create(['mediable_type' => 'experience', 'mediable_id' => $experience->id]);
+        Media::factory()->create(); // different owner
+
+        $this->actingAsStaff()
+            ->getJson("/api/v1/admin/experiences/{$experience->id}/media")
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
     }
 
     // ─── DESTROY ──────────────────────────────────────────────

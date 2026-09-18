@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domains\Destinations\Models\Destination;
 use App\Domains\Destinations\Models\Place;
+use App\Domains\Experiences\Models\Experience;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -29,12 +30,12 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($request->string('email')->lower()->toString().'|'.$request->ip());
         });
 
-        // Short aliases for polymorphic `media`/`translations` morph columns,
-        // decoupled from namespaced class names — extend here for 'experience'
-        // once the Experiences domain lands.
+        // Short aliases for polymorphic `media`/`translations`/`policies`
+        // morph columns, decoupled from namespaced class names.
         Relation::morphMap([
             'destination' => Destination::class,
             'place' => Place::class,
+            'experience' => Experience::class,
         ]);
     }
 }
