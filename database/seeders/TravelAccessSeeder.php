@@ -16,7 +16,7 @@ class TravelAccessSeeder extends Seeder
         // Grants access to the staff/admin SPA's session-bootstrap endpoint
         // (ARCHITECTURE.md §5) — every staff role below gets this; `traveler` does not.
         'admin.access',
-        'dashboard.view', 'destinations.manage', 'experiences.manage',
+        'dashboard.view', 'departments.manage', 'destinations.manage', 'experiences.manage',
         'availability.manage', 'pricing.manage', 'itineraries.manage',
         'reservations.view', 'reservations.manage', 'reservations.amend',
         'payments.manage', 'refunds.manage', 'partners.manage', 'content.manage',
@@ -27,7 +27,7 @@ class TravelAccessSeeder extends Seeder
     private const ROLE_PERMISSIONS = [
         'traveler' => [],
         'travel-agent' => ['admin.access', 'itineraries.manage', 'reservations.view', 'reservations.manage', 'support.manage'],
-        'operations-officer' => ['admin.access', 'dashboard.view', 'availability.manage', 'reservations.view', 'reservations.manage', 'reservations.amend', 'partners.manage', 'support.manage'],
+        'operations-officer' => ['admin.access', 'dashboard.view', 'departments.manage', 'availability.manage', 'reservations.view', 'reservations.manage', 'reservations.amend', 'partners.manage', 'support.manage'],
         'content-editor' => ['admin.access', 'destinations.manage', 'experiences.manage', 'content.manage'],
         'finance-officer' => ['admin.access', 'dashboard.view', 'payments.manage', 'refunds.manage', 'reports.view'],
         'partner-user' => ['admin.access', 'reservations.view'],

@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * Creates a new traveler account and returns a signed-in access token for it.
+ * The public self-registration entry point (`POST /api/v1/auth/register`) —
+ * always produces a `traveler`-role account with a matching TravelerProfile.
+ * Not a generic "create a user" helper: a staff or partner account needs its
+ * own Action creating its own profile type, never this one.
  */
 class RegisterTraveler implements Action
 {
@@ -27,6 +30,7 @@ class RegisterTraveler implements Action
             ]);
 
             $user->assignRole('traveler');
+            $user->travelerProfile()->create([]);
 
             return $user;
         });
