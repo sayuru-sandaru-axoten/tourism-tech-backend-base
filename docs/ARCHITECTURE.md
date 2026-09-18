@@ -51,6 +51,29 @@ app/Domains/<Domain>/
   routes.php        # this domain's routes; required from routes/api.php, never inlined there (see §6)
 ```
 
+### 2.1 One-to-one profile tables (`traveler_profiles`, `staff_profiles`, `partner_profiles`)
+
+`users` is intentionally thin — auth/identity/RBAC fields only. Everything account-type-specific
+(`date_of_birth`/`passport_number`/`loyalty_*` for a traveler; whatever a staff or partner account needs
+later) lives in its own 1:1 extension table, FK'd to `users.id` with a `unique()` constraint (one row per
+user), never bolted onto `users` itself.
+
+These tables are **not mutually exclusive** — nothing stops a single `users` row from eventually having more
+than one profile type (e.g. a staff member who also books trips as a traveler). What keeps them from
+clashing as more are added:
+
+- Each profile type is created **only** by the one Action responsible for that account type.
+  `App\Domains\Identity\Actions\RegisterTraveler` — the public `POST /api/v1/auth/register` entry point —
+  is the only thing that creates a `TravelerProfile`, in the same `DB::transaction()` as the `User` row and
+  the `traveler` role assignment. A future staff-invite/creation Action must do the same for
+  `StaffProfile`, independently — it must never call `RegisterTraveler` or touch `TravelerProfile`.
+- No shared "create a profile" function should ever branch on account type. If you find yourself writing
+  `if ($type === 'staff') { ... } elseif ($type === 'traveler') { ... }` in one place, that's the pattern
+  this section exists to prevent — split it into separate Actions instead.
+- System-managed fields on a profile (e.g. `traveler_profiles.loyalty_tier`/`loyalty_points`, owned by the
+  future Loyalty domain) are deliberately left out of the model's `$fillable`, so a traveler-facing
+  profile-update endpoint can't mass-assign them even by accident.
+
 Cross-cutting, domain-agnostic code stays in `app/Support/` — where `App\Support\Http\ApiResponse` already
 lives. This doc adds one more piece to that layer:
 

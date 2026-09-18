@@ -36,6 +36,9 @@ class AuthTest extends TestCase
             ->assertJsonStructure(['data' => ['access_token', 'token_type', 'expires_in', 'user']]);
 
         $this->assertDatabaseHas('users', ['email' => 'ama@example.com']);
+
+        $user = User::query()->where('email', 'ama@example.com')->firstOrFail();
+        $this->assertDatabaseHas('traveler_profiles', ['user_id' => $user->id]);
     }
 
     public function test_a_user_can_log_in_and_access_their_profile(): void

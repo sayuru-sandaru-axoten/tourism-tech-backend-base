@@ -32,6 +32,8 @@ class RegisterTravelerTest extends TestCase
         $user = User::query()->where('email', 'ama@example.com')->firstOrFail();
         $this->assertTrue($user->hasRole('traveler'));
         $this->assertSame(UserStatus::Active, $user->status);
+        $this->assertNotNull($user->travelerProfile);
+        $this->assertSame(0, $user->travelerProfile->loyalty_points);
         $authenticatedUser = ApiGuard::guard()->setToken($token)->user();
         $this->assertInstanceOf(User::class, $authenticatedUser);
         $this->assertTrue($authenticatedUser->is($user));
